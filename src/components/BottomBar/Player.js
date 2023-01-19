@@ -1,12 +1,18 @@
 import { Icon } from "../Icons"
-import { useAudio } from "react-use"
+import { useAudio, useFullscreen, useToggle } from "react-use"
 import { secondsToTime } from "utils"
 import CustomRange from "components/CustomRange"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setControls, setCurrent, setPlaying, setSidebar } from "stores/player"
+import FullScreenPlayer from "components/FullScreen"
 
 function Player(){
+
+    const fullRef = useRef()
+
+    const [show, toggle] = useToggle()
+    const isFullscreen = useFullscreen(fullRef,show,{onClose:()=>toggle(false)})
 
     const {current, sidebar} = useSelector(state=>state.player)
 
@@ -68,7 +74,7 @@ function Player(){
                 </div>
                 )}
             </div>
-            <div className="flex flex-col items-center max-w-[45.125rem] w-[40%]">
+            <div className="flex flex-col items-center pt-2 px-4 max-w-[45.125rem] w-[40%]">
                 {audio}
                 <div className="flex items-center gap-x-2">
                     <button className="w-8 h-8 flex items-center justify-center text-white text-opacity-70 hover:text-opacity-100">
@@ -97,7 +103,7 @@ function Player(){
                     </div>
                 </div>
             </div>
-            <div className="min-w-[11.25rem] w-[30% ] flex justify-end items-center">
+            <div className="min-w-[11.25rem] w-[30%] flex justify-end items-center">
                 <button className="w-8 h-8 flex items-center justify-center text-white text-opacity-70 hover:text-opacity-100">
                     <Icon name="listMusic" size="16" />
                 </button>
@@ -119,6 +125,15 @@ function Player(){
                 }} 
                 />
                 </div>
+                <button
+                className="w-8 h-8 flex items-center justify-center text-white text-opacity-70 hover:text-opacity-100"
+                onClick={()=>toggle()}
+                >
+                    <Icon name="fullScreen" size="22" />
+                </button>
+            </div>
+            <div ref={fullRef}>
+               {isFullscreen && <FullScreenPlayer volumeIcon={volumeIcon} toggle={toggle} state={state} controls={controls} />}
             </div>
         </div>
     )
